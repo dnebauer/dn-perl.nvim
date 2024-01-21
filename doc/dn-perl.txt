@@ -1,0 +1,152 @@
+*dn-perl-nvim.txt*  For Neovim version 0.9  Last change: 2024 January 15
+
+==============================================================================
+Table of Contents                                             *dn_perl.contents*
+
+Introduction ··················································· |dn_perl.intro|
+Dependencies ·················································· |dn_perl.depend|
+Features ···················································· |dn_perl.features|
+Functions ·················································· |dn_perl.functions|
+Options ······················································ |dn_perl.options|
+Mappings ···················································· |dn_perl.mappings|
+Commands ···················································· |dn_perl.commands|
+
+==============================================================================
+Introduction                                                     *dn_perl.intro*
+
+An auxiliary perl5 plugin providing:
+• a custom version of the "perlcritic" script
+• customised K help.
+
+==============================================================================
+Dependencies                                                    *dn_perl.depend*
+
+This ftplugin depends on:
+• the dn-utils plugin (https://github.com/dnebauer/dn-utils.nvim)
+• the executable "perlcritic" provided as part of the Perl::Critic perl
+  module (https://metacpan.org/pod/Perl::Critic).
+
+==============================================================================
+Features                                                      *dn_perl.features*
+
+Perlcritic ~
+
+Perl::Critic is a perl module that critiques perl source code for best
+practices. The module can analyse code with varying degress of strictness,
+referred to as severity. The 5 levels of severity are:
+• 5 (gentle)
+• 4 (stern)
+• 3 (harsh)
+• 2 (cruel)
+• 1 (brutal).
+
+The Perl::Critic module provides a convenience script called
+"perlcritic" which is used by this ftplugin. It can be run on the current
+file using:
+• function |dn_perl.critic|
+• command |dn_perl.Critic|
+• mappings |dn_perl.<Leader>c1| to |dn_perl.<Leader>c5|, usually "\c1"
+  to "\c5".
+
+The feedback from perlcritic is displayed in a |location-list|.
+
+Note that perlcritic is not run on the contents of the buffer, but on the
+associated file, so the buffer must be associated with a file. The buffer
+is automatically saved before running perlcritic to ensure it is run on
+the current contents of the buffer.
+
+K looks in more locations for help ~
+
+Change |K| by changing value of 'keywordprg'. Alter default behaviour of
+looking in function help:
+>
+  perldoc -f X
+<
+to look sequentially in function, variable, general and faq help:
+>
+  perldoc -f X || perldoc -v X || perldoc X || perldoc -q X
+<
+
+==============================================================================
+Functions                                                    *dn_perl.functions*
+
+dn_perl.critic({severity})                                      *dn_perl.critic*
+    Runs perlcritic and opens provided feedback in a |location-list|.
+
+    Parameters: ~
+        {severity}  (integer|string)  Severity level from 5 (gentle) to
+                                      1 (harsh), assumed to be an integer from
+                                      1-5 or a string whose first character is
+                                      an integer from 1-5, such as "5=gentle"
+
+    Returns: ~
+        (boolean)  Indicates whether perlcritic was run successfully
+
+
+==============================================================================
+Options                                                        *dn_perl.options*
+
+                                                            *dn_perl.keywordprg*
+'keywordprg' ~
+
+Change |K| to look in more locations for help.
+This is done by adjusting 'keywordprg' from:
+>
+  perldoc -f X
+<
+to look sequentially in function, variable, general and faq help:
+>
+  perldoc -f X || perldoc -v X || perldoc X || perldoc -q X
+<
+
+==============================================================================
+Mappings                                                      *dn_perl.mappings*
+
+                                                                   *dn_perl.\c1*
+                                                            *dn_perl.<Leader>c1*
+<Leader>c1 ~
+
+Run perlcritic with severity level 1 (brutal) in modes "n" and "i".
+
+                                                                   *dn_perl.\c2*
+                                                            *dn_perl.<Leader>c2*
+<Leader>c2 ~
+
+Run perlcritic with severity level 2 (cruel) in modes "n" and "i".
+
+                                                                   *dn_perl.\c3*
+                                                            *dn_perl.<Leader>c3*
+<Leader>c3 ~
+
+Run perlcritic with severity level 3 (harsh) in modes "n" and "i".
+
+                                                                   *dn_perl.\c4*
+                                                            *dn_perl.<Leader>c4*
+<Leader>c4 ~
+
+Run perlcritic with severity level 4 (stern) in modes "n" and "i".
+
+                                                                   *dn_perl.\c5*
+                                                            *dn_perl.<Leader>c5*
+<Leader>c5 ~
+
+Run perlcritic with severity level 5 (gentle) in modes "n" and "i".
+
+==============================================================================
+Commands                                                      *dn_perl.commands*
+
+                                                               *dn_perl.:Critic*
+                                                                *dn_perl.Critic*
+Critic ~
+
+Run perlcritic with a specified severity level. The security level can be
+specified as an integer from 1 to 5, or a string whose first character is
+a digit from 1 to 5.
+Has |:command-completion| with the following values:
+• 5=gentle
+• 4=stern
+• 3=harsh
+• 2=cruel
+• 1=brutal
+
+vim:tw=78:ts=8:noet:ft=help:norl:
