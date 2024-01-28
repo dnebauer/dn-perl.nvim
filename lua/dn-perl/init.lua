@@ -68,7 +68,7 @@ local dn_perl = {}
 
 -- only load module once
 if vim.g.dn_perl_loaded then
-  return
+	return
 end
 vim.g.dn_perl_loaded = true
 
@@ -96,11 +96,11 @@ local _complete_critic_severity
 ---• 2=cruel
 ---• 1=brutal
 _complete_critic_severity = function(arg, line, pos)
-  local _ = { line, pos } -- avoid "unused local '{line,pos}'" errors
-  local levels = { "5=gentle", "4=stern", "3=harsh", "2=cruel", "1=brutal" }
-  return vim.tbl_filter(function(item)
-    return item:match(arg)
-  end, levels)
+	local _ = { line, pos } -- avoid "unused local '{line,pos}'" errors
+	local levels = { "5=gentle", "4=stern", "3=harsh", "2=cruel", "1=brutal" }
+	return vim.tbl_filter(function(item)
+		return item:match(arg)
+	end, levels)
 end
 
 -- PUBLIC FUNCTIONS
@@ -116,108 +116,108 @@ end
 ---an integer from 1-5, such as "5=gentle"
 ---@return boolean _ Indicates whether perlcritic was run successfully
 function dn_perl.critic(severity)
-  -- process param
-  local level
-  local arg_type = type(severity)
-  if arg_type == "string" then
-    -- assume string like "5=gentle" whose first char is an integer 1-5
-    local first_char = severity:sub(1, 1)
-    level = tonumber(first_char)
-    if level == nil then
-      util.error(sf("Invalid severity '%s'", severity))
-      return false
-    end
-    if not util.valid_pos_int(level) then
-      util.error(sf("First character '%s' is not an integer", first_char))
-      return false
-    end
-  elseif arg_type == "number" then
-    level = severity
-    if not util.valid_pos_int(level) then
-      util.error(sf("Severity (%s) is not an integer", tostring(level)))
-      return false
-    end
-  else
-    util.error(sf("Invalid severity data type: %s", arg_type))
-    return false
-  end
-  if level < 1 or level > 5 then
-    util.error(sf("Severity level (%d) out of range 1-5", level))
-    return false
-  end
-  -- get filepath
-  local fp = vim.api.nvim_buf_get_name(0)
-  if fp:len() == 0 then
-    util.error("Must be a file associated with the buffer to run perlcritic")
-    return false
-  end
-  -- update file contents
-  vim.api.nvim_cmd({ cmd = "update" }, {})
-  -- run perlcritic and capture output
-  local critic = "perlcritic"
-  if vim.fn.executable(critic) ~= 1 then
-    util.error(sf("Unable to run %s - is it installed?", critic))
-    return false
-  end
-  -- • because perlcritic can take a long time to run on a large file, I
-  --   would like to notify user here that perlcritic is running;
-  --   unfortunately all attempts (vim.cmd.echo, print, vim.print, util.info)
-  --   only display after perlcritic has completed; this occurs even if
-  --   Noice is disabled
-  local result = util.execute_shell_command(critic, "--severity", level, fp)
-  -- • cannot check exit status because perlcritic has previously exited with
-  --   this error even when successful:
-  --   "Tests were run but no plan was declared and done_testing()
-  --    was not seen."
-  --   There is currently no known way to determine whether perlcritic
-  --   succeeded, so let's just assume it did
-  local output = util.split(result.stdout, "\n")
-  output = util.table_remove_empty_end_items(output)
-  if vim.tbl_isempty(output) then
-    util.info("Perlcritic reported no errors or warnings")
-    return true
-  end
-  -- convert output into location list input
-  local bufnr = vim.api.nvim_win_get_buf(0)
-  -- • initially save list items to nested dicts indexed on line then col
-  local loclist_data = {}
-  for _, line in ipairs(output) do
-    local text_part1, str_lnum, str_col, text_part2 = line:match("^(.-) at line (%d+), column (%d+)(.+)$")
-    local text, lnum, col
-    if text_part1 then
-      lnum = tonumber(str_lnum)
-      col = tonumber(str_col)
-      text = text_part1 .. text_part2
-    else
-      lnum = 1
-      col = 1
-      text = line
-    end
-    text = text:gsub("%s+", " ") -- remove double spaces
-    local list_item = { bufnr = bufnr, lnum = lnum, col = col, text = text }
-    str_lnum = string.format("%016d", lnum)
-    str_col = string.format("%016d", col)
-    if not loclist_data[str_lnum] then
-      loclist_data[str_lnum] = {}
-    end
-    if not loclist_data[str_lnum][str_col] then
-      loclist_data[str_lnum][str_col] = {}
-    end
-    table.insert(loclist_data[str_lnum][str_col], list_item)
-  end
-  -- • now build list of loclist input
-  local loclist_input = {}
-  for _, col_table in util.pairs_by_keys(loclist_data) do
-    for _, items in util.pairs_by_keys(col_table) do
-      for _, item in ipairs(items) do
-        table.insert(loclist_input, item)
-      end
-    end
-  end
-  -- display location list
-  vim.api.nvim_call_function("setloclist", { 0, loclist_input })
-  vim.api.nvim_cmd({ cmd = "lopen" }, {})
-  return true
+	-- process param
+	local level
+	local arg_type = type(severity)
+	if arg_type == "string" then
+		-- assume string like "5=gentle" whose first char is an integer 1-5
+		local first_char = severity:sub(1, 1)
+		level = tonumber(first_char)
+		if level == nil then
+			util.error(sf("Invalid severity '%s'", severity))
+			return false
+		end
+		if not util.valid_pos_int(level) then
+			util.error(sf("First character '%s' is not an integer", first_char))
+			return false
+		end
+	elseif arg_type == "number" then
+		level = severity
+		if not util.valid_pos_int(level) then
+			util.error(sf("Severity (%s) is not an integer", tostring(level)))
+			return false
+		end
+	else
+		util.error(sf("Invalid severity data type: %s", arg_type))
+		return false
+	end
+	if level < 1 or level > 5 then
+		util.error(sf("Severity level (%d) out of range 1-5", level))
+		return false
+	end
+	-- get filepath
+	local fp = vim.api.nvim_buf_get_name(0)
+	if fp:len() == 0 then
+		util.error("Must be a file associated with the buffer to run perlcritic")
+		return false
+	end
+	-- update file contents
+	vim.api.nvim_cmd({ cmd = "update" }, {})
+	-- run perlcritic and capture output
+	local critic = "perlcritic"
+	if vim.fn.executable(critic) ~= 1 then
+		util.error(sf("Unable to run %s - is it installed?", critic))
+		return false
+	end
+	-- • because perlcritic can take a long time to run on a large file, I
+	--   would like to notify user here that perlcritic is running;
+	--   unfortunately all attempts (vim.cmd.echo, print, vim.print, util.info)
+	--   only display after perlcritic has completed; this occurs even if
+	--   Noice is disabled
+	local result = util.execute_shell_command(critic, "--severity", level, fp)
+	-- • cannot check exit status because perlcritic has previously exited with
+	--   this error even when successful:
+	--   "Tests were run but no plan was declared and done_testing()
+	--    was not seen."
+	--   There is currently no known way to determine whether perlcritic
+	--   succeeded, so let's just assume it did
+	local output = util.split(result.stdout, "\n")
+	output = util.table_remove_empty_end_items(output)
+	if vim.tbl_isempty(output) then
+		util.info("Perlcritic reported no errors or warnings")
+		return true
+	end
+	-- convert output into location list input
+	local bufnr = vim.api.nvim_win_get_buf(0)
+	-- • initially save list items to nested dicts indexed on line then col
+	local loclist_data = {}
+	for _, line in ipairs(output) do
+		local text_part1, str_lnum, str_col, text_part2 = line:match("^(.-) at line (%d+), column (%d+)(.+)$")
+		local text, lnum, col
+		if text_part1 then
+			lnum = tonumber(str_lnum)
+			col = tonumber(str_col)
+			text = text_part1 .. text_part2
+		else
+			lnum = 1
+			col = 1
+			text = line
+		end
+		text = text:gsub("%s+", " ") -- remove double spaces
+		local list_item = { bufnr = bufnr, lnum = lnum, col = col, text = text, type = "E" }
+		str_lnum = string.format("%016d", lnum)
+		str_col = string.format("%016d", col)
+		if not loclist_data[str_lnum] then
+			loclist_data[str_lnum] = {}
+		end
+		if not loclist_data[str_lnum][str_col] then
+			loclist_data[str_lnum][str_col] = {}
+		end
+		table.insert(loclist_data[str_lnum][str_col], list_item)
+	end
+	-- • now build list of loclist input
+	local loclist_input = {}
+	for _, col_table in util.pairs_by_keys(loclist_data) do
+		for _, items in util.pairs_by_keys(col_table) do
+			for _, item in ipairs(items) do
+				table.insert(loclist_input, item)
+			end
+		end
+	end
+	-- display location list
+	vim.api.nvim_call_function("setloclist", { 0, loclist_input })
+	vim.api.nvim_cmd({ cmd = "lopen" }, {})
+	return true
 end
 
 -- OPTIONS
@@ -260,7 +260,7 @@ vim.api.nvim_buf_set_var(vim.api.nvim_get_current_buf(), "undo_ftplugin", "setlo
 ---Run perlcritic with severity level 1 (brutal) in modes "n" and "i".
 ---@brief ]]
 vim.keymap.set({ "n", "i" }, "<Leader>c1", function()
-  dn_perl.critic("1=brutal")
+	dn_perl.critic("1=brutal")
 end, { buffer = true, desc = "Run perlcritic with severity level 1 (brutal)" })
 
 ---@tag dn_perl.\c2
@@ -271,7 +271,7 @@ end, { buffer = true, desc = "Run perlcritic with severity level 1 (brutal)" })
 ---Run perlcritic with severity level 2 (cruel) in modes "n" and "i".
 ---@brief ]]
 vim.keymap.set({ "n", "i" }, "<Leader>c2", function()
-  dn_perl.critic("2=cruel")
+	dn_perl.critic("2=cruel")
 end, { buffer = true, desc = "Run perlcritic with severity level 2 (cruel)" })
 
 ---@tag dn_perl.\c3
@@ -282,7 +282,7 @@ end, { buffer = true, desc = "Run perlcritic with severity level 2 (cruel)" })
 ---Run perlcritic with severity level 3 (harsh) in modes "n" and "i".
 ---@brief ]]
 vim.keymap.set({ "n", "i" }, "<Leader>c3", function()
-  dn_perl.critic("3=harsh")
+	dn_perl.critic("3=harsh")
 end, { buffer = true, desc = "Run perlcritic with severity level 3 (harsh)" })
 
 ---@tag dn_perl.\c4
@@ -293,7 +293,7 @@ end, { buffer = true, desc = "Run perlcritic with severity level 3 (harsh)" })
 ---Run perlcritic with severity level 4 (stern) in modes "n" and "i".
 ---@brief ]]
 vim.keymap.set({ "n", "i" }, "<Leader>c4", function()
-  dn_perl.critic("4=stern")
+	dn_perl.critic("4=stern")
 end, { buffer = true, desc = "Run perlcritic with severity level 4 (stern)" })
 
 ---@tag dn_perl.\c5
@@ -304,7 +304,7 @@ end, { buffer = true, desc = "Run perlcritic with severity level 4 (stern)" })
 ---Run perlcritic with severity level 5 (gentle) in modes "n" and "i".
 ---@brief ]]
 vim.keymap.set({ "n", "i" }, "<Leader>c5", function()
-  dn_perl.critic("5=gentle")
+	dn_perl.critic("5=gentle")
 end, { buffer = true, desc = "Run perlcritic with severity level 5 (gentle)" })
 
 -- COMMANDS
@@ -329,7 +329,7 @@ end, { buffer = true, desc = "Run perlcritic with severity level 5 (gentle)" })
 ---• 1=brutal
 ---@brief ]]
 vim.api.nvim_buf_create_user_command(0, "Critic", function(opts)
-  dn_perl.critic(opts.args)
+	dn_perl.critic(opts.args)
 end, { nargs = 1, complete = _complete_critic_severity, desc = "Run perlcritic with desired severity level" })
 
 return dn_perl
