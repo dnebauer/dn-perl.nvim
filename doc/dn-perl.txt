@@ -8,12 +8,15 @@ Dependencies ·································�
 Features ···················································· |dn_perl.features|
 Functions ·················································· |dn_perl.functions|
 Mappings ···················································· |dn_perl.mappings|
+Commands ···················································· |dn_perl.commands|
 
 ==============================================================================
 Introduction                                                     *dn_perl.intro*
 
-An auxiliary perl5 plugin providing customised |K|-type help mapped to "L"
-in normal and visual modes
+An auxiliary perl5 plugin that:
+• provides customised |K|-type help mapped to "L" in normal and visual
+  modes
+• inserts a Perl::Critic policy name after the cursor.
 
 ==============================================================================
 Dependencies                                                    *dn_perl.depend*
@@ -49,6 +52,11 @@ equivalent of running the shell command:
   perldoc -f X || perldoc -v X || perldoc X || perldoc -q X
 <
 
+Insert a Perl::Critic policy name ~
+
+The user selects a Perl::Critic policy from a menu and the minor part of
+the name (the part after the "::") is inserted after the cursor.
+
 ==============================================================================
 Functions                                                    *dn_perl.functions*
 
@@ -73,6 +81,18 @@ dn_perl.perldoc_help()                                    *dn_perl.perldoc_help*
         (nil)  No return value
 
 
+dn_perl.insert_policy_name()                        *dn_perl.insert_policy_name*
+    Select a Perl::Critic policy and insert the minor part (after the "::"
+    separator) after the cursor. (This means it is not possible to insert the
+    minor part at the beginning of a line.)
+
+    Requires that the "perlcritic" executable distributed with perl module
+    Perl::Critic is available.
+
+    Returns: ~
+        (nil)  No return value
+
+
 ==============================================================================
 Mappings                                                      *dn_perl.mappings*
 
@@ -81,5 +101,15 @@ L ~
 
 Display perldoc help for search term under cursor or highlighted.
 Works in normal and visual modes.
+
+                                                            *dn_perl.<Leader>pc*
+This mapping calls the function |dn_perl.insert_policy_name| in mode "n".
+
+==============================================================================
+Commands                                                      *dn_perl.commands*
+
+                                            *dn_perl.InsertPerlCriticPolicyName*
+User selects a Perl::Critic policy and the policy name is inserted at the
+cursor location.
 
 vim:tw=78:ts=8:noet:ft=help:norl:
