@@ -100,7 +100,7 @@ function dn_perl.perldoc_help()
 	end
 	-- • an empty line can be a <cWORD> --
 	--   not sure about <cword> but why take a chance?
-	if term:match("^%s*$") ~= nil then
+	if term ~= nil and term:match("^%s*$") ~= nil then
 		return
 	end
 	-- get perldoc help
