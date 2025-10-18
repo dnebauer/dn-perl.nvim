@@ -1,4 +1,4 @@
-*dn-perl-nvim.txt*  For Neovim version 0.9  Last change: 2024 February 07
+*dn-perl-nvim.txt*  For Neovim version 0.9  Last change: 2025 October 18
 
 ==============================================================================
 Table of Contents                                             *dn_perl.contents*

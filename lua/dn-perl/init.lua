@@ -1,7 +1,7 @@
 -- DOCUMENTATION
 
 ---@brief [[
----*dn-perl-nvim.txt*  For Neovim version 0.9  Last change: 2024 February 07
+---*dn-perl-nvim.txt*  For Neovim version 0.9  Last change: 2025 October 18
 ---@brief ]]
 
 ---@toc dn_perl.contents
@@ -63,10 +63,38 @@ if vim.g.dn_perl_loaded then
 end
 vim.g.dn_perl_loaded = true
 
+-- private plugin configuration options
+-- • none defined at this time
+local _config = {}
+
 local sf = string.format
 local util = require("dn-utils")
 
 -- PRIVATE FUNCTIONS
+
+-- config([opts])
+
+---@private
+---Function required by several popular plugin managers.
+---It ignores any options passed to it.
+---
+---@param opts table|nil Configuration options. Ignored.
+---@return nil _ No return value
+function dn_perl.config(opts)
+	_config = vim.tbl_deep_extend("force", _config, opts or {})
+end
+
+-- setup([opts])
+
+---@private
+---Function required by several popular plugin managers.
+---It ignores any options passed to it.
+---
+---@param opts table|nil Configuration options. Ignored.
+---@return nil _ No return value
+function dn_perl.setup(opts)
+	dn_perl.config(opts)
+end
 
 -- PUBLIC FUNCTIONS
 
