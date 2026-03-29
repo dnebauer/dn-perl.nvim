@@ -229,7 +229,7 @@ end
 ---@brief ]]
 vim.keymap.set({ "n", "v" }, "L", function()
 	dn_perl.perldoc_help()
-end, { buffer = true, desc = "Display perldoc help for search term" })
+end, { buf = 0, desc = "Display perldoc help for search term" })
 
 -- \pc [n]
 
